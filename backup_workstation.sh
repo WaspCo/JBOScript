@@ -2,14 +2,18 @@
 #Purpose = Backup of system ssd
 #Created on 181017
 #Pour modifier le scheduling, => crontab -e
+#TODO => restore option
 #Version 1.0
 #START
 
+clear
+USER=waspco
 START_TIME=$SECONDS
 DATE=`date +%d%m%y` #Add date to backup
 DST=/run/media/waspco/Raid-Backup/backup #Destination of backup file.
 
 #System partition for fsarchiver
+P0=/dev/sda
 P1=/dev/sda1
 P2=/dev/sda2
 P3=/dev/sda3
@@ -67,41 +71,52 @@ if [ ! -d "$DST/backup_ssd_$DATE" ]; then
   mkdir /run/media/waspco/Raid-Backup/backup/backup_ssd_$DATE
 fi
 
-# First we backup the filesystem onto the backup disk
+#Backup of the partition table onto the backup disk
+echo "Backup of the partition table:"
+sudo sgdisk --backup=$DST/backup_ssd_$DATE/partition_table_$DATE.txt $P0
+echo " "
+
+#Backup the filesystem onto the backup disk
 fsarchiver savefs -z 1 -o $DST/backup_ssd_$DATE/backup_ssd_$DATE.fsa $P1 $P2 $P3 $P4 -j3 -A
 
 # Then we synchronise the content of the raid
-if [ ! -d "$S1" ]; then
+if [ ! -d "$S1" ]
+then
   echo "S1 -> $S1 is not accessible !"
   ERR=1
-elif [ ! -d "$D1" ]; then
+elif [ ! -d "$D1" ]
+then
   echo "D1 -> $D1 is not accessible !"
   ERR=1
 else
+  echo "Syncing S1 -> $S1"
   rsync -a --stats --force --progress --delete $S1 $D1
 fi
-
-if [ ! -d "$S2" ]; then
+echo " "
+if [ ! -d "$S2" ]
+then
   echo "S2 -> $S2 is not accessible !"
   ERR=1
-elif [ ! -d "$D2" ]; then
+elif [ ! -d "$D2" ]
+then
   echo "D2 -> $D2 is not accessible !"
   ERR=1
 else
+  echo "Syncing S2 -> $S2"
   rsync -a --stats --force --progress --delete $S2 $D2
 fi
 
 
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 
-if [ $ERR = 0 ]; then
-  zenity --notification\
-      --window-icon="info" \
-      --text="System successfully backed up in $ELAPSED_TIME seconds"
+#Send notifications to gnome (as regular user)
+if [ ! -n "$ERR" ]
+then
+  DISPLAY=:0.0 su $USER -c "notify-send 'System successfully backed up in $ELAPSED_TIME seconds' -t 0 -u critical -i /usr/share/icons/Paper/24x24/apps/zen-icon.png"
+  echo "System successfully backed up in $ELAPSED_TIME seconds"
 else
-  zenity --notification\
-      --window-icon="info" \
-      --text="There was an error while backing up the system, check up needed"
+  DISPLAY=:0.0 su $USER -c "notify-send 'There was an error while backing up the system' -t 0 -u critical -i /usr/share/icons/Paper/24x24/apps/abrt.png"
+  echo "There was an error while backing up the system, check up needed"
 fi
 
 echo " "
