@@ -5,6 +5,9 @@
 #Use image files and rsync the filesystem into it
 #START
 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+
 START_TIME=$SECONDS
 DATE=`date +%d%m%y`
 
@@ -33,6 +36,11 @@ if [ -n "$S3" ]; then
 fi
 echo " "
 
+
+if [ ! -f "$DST" ]; then
+  mount /dev/sda1 /mnt/ssd
+fi
+
 if [ ! -d "$DST" ]; then
   mkdir /mnt/ssd/backup
 fi
@@ -42,29 +50,37 @@ sgdisk --backup=$DST/partition_table.txt $S0
 
 ################################################################################
 #First partition, mount img and rsync ##########################################
+echo " "
+echo "Backup of the first partition has started"
 if [ ! -f "$DST/backup_bananapi_p1.img" ]; then
-  dd if=$S1 of=$DST/backup_bananapi_p1.img status=progress bs=4096
+  dd if=$S1 of=$DST/backup_bananapi_p1.img bs=4096
 fi
 
 mkdir /mnt/d1
 mount $DST/backup_bananapi_p1.img /mnt/d1
-rsync -a --stats --force --progress --delete $S1 $DST/backup_bananapi_p1.img
+rsync -avxHAX --stats --force --progress --delete /boot/ /mnt/d1/
 umount /mnt/d1
-rm /mnt/d1
+rm -fr /mnt/d1
+echo "Backup of the first partition has ended"
+echo " "
 
 ################################################################################
 #Second partition, mount img and rsync #########################################
+echo " "
+echo "Backup of the second partition has started"
 if [ ! -f "$DST/backup_bananapi_p2.img" ]; then
-  dd if=$S2 of=$DST/backup_bananapi_p2.img status=progress bs=4096
+  dd if=$S2 of=$DST/backup_bananapi_p2.img bs=4096
 fi
 
 mkdir /mnt/d2
 mount $DST/backup_bananapi_p2.img /mnt/d2
-rsync -a --stats --force --progress --delete $S2 $DST/backup_bananapi_p2.img
+rsync -avxHAX --stats --force --progress --delete --exclude '/boot' --exclude '/var/log' --exclude '/mnt' / /mnt/d2
 umount /mnt/d2
-rm /mnt/d2
+rm -fr /mnt/d2
+echo "Backup of the second partition has ended"
+echo " "
 
-ELAPSED_TIME=&(($SECONDS - $START_TIME))
+ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Backup of NVME laptop ssd took $ELAPSED_TIME seconds"
 echo " "
 echo "---------------------------------------"

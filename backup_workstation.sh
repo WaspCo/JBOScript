@@ -90,7 +90,7 @@ then
   ERR=1
 else
   echo "Syncing S1 -> $S1"
-  rsync -a --stats --force --progress --delete $S1 $D1
+  rsync -a --no-links --stats --force --progress --delete $S1 $D1
 fi
 echo " "
 if [ ! -d "$S2" ]
@@ -103,7 +103,7 @@ then
   ERR=1
 else
   echo "Syncing S2 -> $S2"
-  rsync -a --stats --force --progress --delete $S2 $D2
+  rsync -a --no-links --stats --force --progress --delete $S2 $D2
 fi
 
 
