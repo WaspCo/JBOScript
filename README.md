@@ -1,9 +1,9 @@
-## JBOScript
+# JBOScript
 
 ~ Just a Bunch Of Script ~
 
 
-# backup_nvme_luks.sh
+## backup_nvme_luks.sh
 
 If you have encrypted your Linux operating system (Fedora in my case), you might
 find that there is no efficient way to backup and restore your system. You
@@ -28,7 +28,7 @@ The restoration is a bit trickier :
 
 You will probably have to edit /etc/fstab to make it work.
 
-# backup_workstation.sh
+## backup_workstation.sh
 
 A simple backup script in 3 steps:
 - Backup system onto backup disk with 'fsarchiver'
@@ -36,7 +36,7 @@ A simple backup script in 3 steps:
 - Synchronize backup and data disks with 'rsync'
 
 
-# backup_banana.sh
+## backup_banana.sh
 
 Another simple backup script. The system is 8Go, only a few things change over time
 and I stock my backup on a SSD, so here the idea is to use 'dd' to make one full
@@ -45,7 +45,7 @@ time in the future to update the content of the backups without writing
 everything again. In case of trouble just 'dd' everything back and voilà.
 
 
-# gpu_clocks.sh
+## gpu_clocks.sh
 
 Overclock my NVIDIA GPU and start a mining software (claymore).
 Made for a Zotac GTX1060 6Go. This script is kind of dirty.
