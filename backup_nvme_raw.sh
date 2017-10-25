@@ -1,8 +1,7 @@
 #!/bin/bash
-#Purpose = Backup of NVME SSD
-#To modify the scheduling => crontab -e
+#Purpose = RAW backup of NVME
+#To modify the scheduling => 'crontab -e' as root
 #Version 1.0
-#Next phase is to backup LUKS LVM partitions as encrypted filesystem without unused data.
 #START
 
 START_TIME=$SECONDS
@@ -13,7 +12,7 @@ DST=/run/media/WaspCo/0f348a9b-bf55-459c-835e-0396e5648795/backup/laptop_backup
 
 echo " "
 echo "---------------------------------------"
-echo "---------- NVME laptop backup ---------"
+echo "----------- NVME RAW backup -----------"
 echo "---------------------------------------"
 echo " "
 
@@ -30,8 +29,8 @@ dd if=/dev/nvme0n1p3 of=$DST/laptop_backup_$DATE/nvme0n1p3.img status=progress b
 echo " "
 
 ELAPSED_TIME=&(($SECONDS - $START_TIME))
-echo "Backup of NVME laptop ssd took $ELAPSED_TIME seconds"
+echo "Backup took $ELAPSED_TIME seconds"
 echo " "
 echo "---------------------------------------"
-echo "-------- End of NVME laptop ssd -------"
+echo "-------- End of NVME RAW backup -------"
 echo "---------------------------------------"

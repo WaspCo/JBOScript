@@ -1,8 +1,10 @@
 #!/bin/bash
 #Purpose = Backup of system ssd
 #Created on 181017
-#Pour modifier le scheduling, => crontab -e
+#Pour modifier le scheduling, => 'crontab -e' as root
 #TODO => restore option
+#FIRST backup the filesystem with fsarchiver
+#THEN rsync the 'pseudo' RAID10
 #Version 1.0
 #START
 
@@ -27,7 +29,7 @@ D2=/run/media/waspco/Raidon-Data/
 
 echo " "
 echo "--------------------------------------"
-echo "----- Lancement de la sauvegarde -----"
+echo "--------- Workstation backup ---------"
 echo "--------------------------------------"
 echo " "
 echo "System partitions for fsarchiver:"
@@ -122,7 +124,7 @@ fi
 echo " "
 echo "Execution en $ELAPSED_TIME secondes."
 echo "--------------------------------------"
-echo "---------------- FIN -----------------"
+echo "----- End of workstation backup ------"
 echo "--------------------------------------"
 echo " "
 #END

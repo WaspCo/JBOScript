@@ -1,6 +1,6 @@
 #!/bin/bash
-#Purpose = Backup of NVME SSD
-#To modify the scheduling => crontab -e
+#Purpose = Backup of my BananaPi mini-computer
+#To modify the scheduling => 'crontab -e' as root
 #Version 1.0
 #Use image files and rsync the filesystem into it
 #START
@@ -84,5 +84,5 @@ ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Backup of NVME laptop ssd took $ELAPSED_TIME seconds"
 echo " "
 echo "---------------------------------------"
-echo "-------- End of NVME laptop ssd -------"
+echo "-------- End of BananaPi backup -------"
 echo "---------------------------------------"
