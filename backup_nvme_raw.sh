@@ -8,7 +8,7 @@ START_TIME=$SECONDS
 DATE=`date +%d%m%y`
 
 SRC=/dev/nvme0n1
-DST=/run/media/WaspCo/0f348a9b-bf55-459c-835e-0396e5648795/backup/laptop_backup
+DST=/run/media/WaspCo/18FE619713130F48/laptop_backup
 
 echo " "
 echo "---------------------------------------"
@@ -21,11 +21,11 @@ echo "Location -> $DST"
 echo " "
 mkdir $DST/laptop_backup_$DATE
 sgdisk --backup=$DST/laptop_backup_$DATE/partition_table_$DATE.txt /dev/nvme0n1
-dd if=/dev/nvme0n1p1 of=$DST/laptop_backup_$DATE/nvme0n1p1.img status=progress bs=4096
+dd if=/dev/nvme0n1p1 of=$DST/laptop_backup_$DATE/nvme0n1p1.img status=progress bs=8092
 echo " "
-dd if=/dev/nvme0n1p2 of=$DST/laptop_backup_$DATE/nvme0n1p2.img status=progress bs=4096
+dd if=/dev/nvme0n1p2 of=$DST/laptop_backup_$DATE/nvme0n1p2.img status=progress bs=8092
 echo " "
-dd if=/dev/nvme0n1p3 of=$DST/laptop_backup_$DATE/nvme0n1p3.img status=progress bs=4096
+dd if=/dev/nvme0n1p3 of=$DST/laptop_backup_$DATE/nvme0n1p3.img status=progress bs=8092
 echo " "
 
 ELAPSED_TIME=&(($SECONDS - $START_TIME))
