@@ -34,8 +34,14 @@ if [ "$1" == "-backup" ]; then
     read SRC;
     echo " "
 
-    echo "Enter the destination directory :"
+    echo "Please enter the destination directory:"
+    DST=0
     read DST;
+    clean_DST="$( echo $DST 2>&1 | sed "s/^\([\"']\)\(.*\)\1\$/\2/g")"
+    if [ "$clean_DST" == 0 ]; then
+      exit
+    fi
+    DST=$clean_DST
     echo " "
 
     echo "Source -> $SRC"
