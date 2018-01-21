@@ -20,7 +20,6 @@ echo "------------ LUKS LVM backup ----------"
 echo "---------------------------------------"
 echo " "
 echo "WARNING: Please check this script configuration before using !"
-echo "         It could break your system a thousand different ways !"
 echo " "
 
 ################################################################################
@@ -30,7 +29,7 @@ if [ "$1" == "-backup" ]; then
     echo "------------- Backup Mode -------------"
     echo " "
 
-    echo "Enter the source LUKS LVM drive to backup (/dev/xxx):"
+    echo "Enter the source LUKS LVM drive to backup (/dev/device):"
     read SRC;
     echo " "
 
@@ -47,6 +46,19 @@ if [ "$1" == "-backup" ]; then
     echo "Source -> $SRC"
     echo "Location -> $DST"
 
+    # check space available and delete oldest folders of necessary
+    AVAILABLE="$(df -Ph $DST | tail -1 | awk '{print $4}')"
+    echo "Space available on disk -> ${AVAILABLE::-1} G"
+    echo " "
+    while [ "${AVAILABLE::-1}" -lt 150 ]; do
+      TODEL="$(find $DST -maxdepth 1 -name "backup_nvme_luks_*" -type d -printf "%TY%Tm%Td%TH%TM%TS %p\n" | sort -nr | tail -1 | cut -d" " -f2 | xargs -n1)"
+      echo "Not enough space on disk, deleting old backup -> $TODEL"
+      rm -fr $TODEL
+      AVAILABLE="$(df -Ph $DST | tail -1 | awk '{print $4}')"
+    done
+    echo " "
+
+    rm -fr $DST/backup_nvme_luks_$DATE &>/dev/null # in case it already exist
     mkdir $DST/backup_nvme_luks_$DATE
     echo "Backup of the partition table ..."
     sgdisk --backup=$DST/backup_nvme_luks_$DATE/partition_table_$DATE.txt $SRC
@@ -56,11 +68,11 @@ if [ "$1" == "-backup" ]; then
     #Backup p1 & p2 and the mouted encrypted volumes in /dev/mapper
     echo "Backup of the partitions ..."
     echo "Please enter a password for the backup encryption. It is gonna take some time."
-    fsarchiver savefs -z 7 -c - -o $DST/backup_nvme_luks_$DATE/backup_nvme_luks_$DATE.fsa ${SRC}p1 ${SRC}p2 /dev/mapper/fedora-root /dev/mapper/fedora-home  -j3 -A
+    fsarchiver savefs -z 2 -c - -o $DST/backup_nvme_luks_$DATE/backup_nvme_luks_$DATE.fsa ${SRC}p1 ${SRC}p2 /dev/mapper/fedora-root /dev/mapper/fedora-home  -j4 -A
     echo "Backup of the partitions ------------------------------------------ OK"
     echo " "
 
-    ELAPSED_TIME=&(($SECONDS - $START_TIME))
+    ELAPSED_TIME=$(($SECONDS - $START_TIME))
     echo "Backup of NVME laptop ssd took $ELAPSED_TIME seconds"
 
 ################################################################################
@@ -291,8 +303,8 @@ cryptsetup luksClose /dev/mapper/$vgname*
 
 echo "Exit Chroot and umount ------------------------------------------------ OK"
 echo " "
-#ELAPSED_TIME=&(($SECONDS - $START_TIME))
-#echo "Backup of NVME laptop ssd took $ELAPSED_TIME seconds"
+ELAPSED_TIME=$(($SECONDS - $START_TIME))
+echo "Backup of NVME laptop ssd took $ELAPSED_TIME seconds"
 echo " "
 echo "--------------------------------------------------------------------------"
 echo "Restoration of the LUKS LVM encrypted system has successfully ended ------"
