@@ -1,9 +1,4 @@
 #!/bin/bash
-#Purpose = Backup of my BananaPi mini-computer
-#To modify the scheduling => 'crontab -e' as root
-#Version 1.0
-#Use image files and rsync the filesystem into it
-#START
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 

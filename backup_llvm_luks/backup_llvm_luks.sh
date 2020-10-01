@@ -1,10 +1,4 @@
 #!/bin/bash
-#Purpose = Backup of LUKS LVM encrypted linux system
-#To modify the scheduling => crontab -e
-#Version 1.1
-#START
-
-#dmsetup remove vg0-root vg0-home vg0-swap fedora_crypt
 
 START_TIME=$SECONDS
 DATE=`date +%d%m%y`
@@ -46,7 +40,7 @@ if [ "$1" == "-backup" ]; then
     echo "Source -> $SRC"
     echo "Location -> $DST"
 
-    # check space available and delete oldest folders of necessary
+    # check space available and delete oldest folders if necessary
     AVAILABLE="$(df -Ph $DST | tail -1 | awk '{print $4}')"
     echo "Space available on disk -> ${AVAILABLE::-1} G"
     echo " "
@@ -68,7 +62,7 @@ if [ "$1" == "-backup" ]; then
     #Backup p1 & p2 and the mouted encrypted volumes in /dev/mapper
     echo "Backup of the partitions ..."
     echo "Please enter a password for the backup encryption. It is gonna take some time."
-    fsarchiver savefs -z 2 -c - -o $DST/backup_nvme_luks_$DATE/backup_nvme_luks_$DATE.fsa ${SRC}p1 ${SRC}p2 /dev/mapper/fedora-root /dev/mapper/fedora-home  -j4 -A
+    fsarchiver savefs -z 0 -c - -o $DST/backup_nvme_luks_$DATE/backup_nvme_luks_$DATE.fsa ${SRC}p1 ${SRC}p2 /dev/mapper/laptop-lvroot /dev/mapper/laptop-lvhome  -j4 -A
     echo "Backup of the partitions ------------------------------------------ OK"
     echo " "
 
